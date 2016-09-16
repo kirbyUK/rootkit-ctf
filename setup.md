@@ -8,14 +8,23 @@
     * Create a root password
     * Default network setup is fine
     * Timezone is Europe -> United Kingdom
-    * Make sure sshd is ticked in System Configuration
+    * Make sure sshd and crash dumps are ticked in System Configuration
     * Yes to add users - make a user called 'ctf' with password 'mwr'. Default
       for all other fields.
-3. Install packages
-    * Reboot and login as root
-    * portsnap fetch
-    * portsnap extract
-    * pkg install samba43
-    * [[ samba config ]]
-    * /etc/rc.conf - add 'samba_enable="YES"'
-    * service samba start
+3. Compile debug kernel
+    * Login as root
+    * `$ cd /usr/src/sys/i386/conf/`
+    * `$ vi DEBUG`
+    * Add the following:
+		```
+		include GENERIC
+       	options KDB_UNATTENDED
+       	options DDB
+		options GDB
+		```
+    * `$ cd /usr/src`
+    * `$ make buildkernel KERNCONF=DEBUG INSTKERNNAME=DEBUG`
+    * Get a coffee
+    * `$ make installkernel KERNCONF=DEBUG INSTKERNNAME=DEBUG`
+    * reboot
+4. 
