@@ -13,18 +13,27 @@
       for all other fields.
 3. Compile debug kernel
     * Login as root
+    * `$ svnlite checkout http://svn.freebsd.org/base/releng/10.3/ /usr/src`
     * `$ cd /usr/src/sys/i386/conf/`
     * `$ vi DEBUG`
     * Add the following:
-		```
-		include GENERIC
-       	options KDB_UNATTENDED
-       	options DDB
-		options GDB
-		```
+	    - include GENERIC
+        - options KDB_UNATTENDED
+        - options DDB
+		- options GDB
     * `$ cd /usr/src`
     * `$ make buildkernel KERNCONF=DEBUG INSTKERNNAME=DEBUG`
     * Get a coffee
     * `$ make installkernel KERNCONF=DEBUG INSTKERNNAME=DEBUG`
-    * reboot
-4. 
+    * `$ reboot`
+4. Configure SSH
+    * File is located at `/etc/ssh/sshd_config`
+    * [edits]
+    * service sshd restart
+5. Build and install kernel module
+    * `$ cd /root/`
+    * `$ git clone <url>`
+    * `$ cd rootkit-ctf`
+    * `$ make`
+    * `$ make install`
+    * `$ kldload ./[rootkit].ko`
