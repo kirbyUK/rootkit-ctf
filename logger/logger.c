@@ -46,7 +46,6 @@ main(int argc, char **argv)
 		}
 		syscall(call, OUTPUT_FILE, buf, 512);
 
-		printf("%s\n", buf);
 		fprintf(fp, "%s\n", buf);
 		fflush(fp);
 		sleep(500);
