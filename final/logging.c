@@ -12,6 +12,7 @@
 
 /* The system call's arguments */
 struct logging_args {
+	char	*filename;
 	char	*buf;
 	size_t	len;
 };
@@ -27,6 +28,9 @@ logging(struct thread *td, void *args)
 
 	uap = (struct logging_args*)args;
 
+	/* Print debug message */
+	printf("[DEBUG] Writing to '%s'\n", uap->filename);
+
 	/* Copy the kernel-space buffer to the provided user-space buffer */
 	copyout(kern_buf, uap->buf, uap->len);
 	memset(kern_buf, 0, sizeof(kern_buf));
@@ -36,7 +40,7 @@ logging(struct thread *td, void *args)
 
 /* The sysent of the new system call */
 static struct sysent logging_sysent = {
-	2,	/* number of arguments */
+	3,	/* number of arguments */
 	logging	/* implementing function */
 };
 
