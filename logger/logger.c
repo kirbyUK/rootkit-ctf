@@ -26,13 +26,9 @@ main(int argc, char **argv)
 	stat.version = sizeof(stat);
 	modstat(modfind(SYSCALL_NAME), &stat);
 	call = stat.data.intval;
-
-	printf("%d\n", call);
 	if (call == 0)
 		return 1;
-
-/*	syscall(call, OUTPUT_FILE, buf, 512);*/
-	syscall(call, (char*)2, buf, 512);
+	syscall(call, OUTPUT_FILE, buf, 512);
 
 	/* Write it to a file */
 	fp = fopen(OUTPUT_FILE, "a");
