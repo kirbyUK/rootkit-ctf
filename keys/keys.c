@@ -48,7 +48,7 @@ main(int argc, char **argv)
 
 		fprintf(fp, "%s\n", buf);
 		fflush(fp);
-		sleep(500);
+		sleep(60);
 	}
 
 	fclose(fp);

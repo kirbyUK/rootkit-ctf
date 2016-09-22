@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# PROVIDE: keys
+
+. /etc/rc.subr
+
+name="keys"
+rcvar="${name}_enable"
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+pidfile="/var/run/${name}.pid"
+command="/usr/sbin/keys"
+
+[ -x "$command" ] || exit 0
+
+keys_start()
+{
+	echo "Starting keys"
+	if [ -s "$pidfile" ]; then
+		echo "Already running!"
+	else
+		nohup "$command" >/dev/null 2>&1 &
+		PID=$!
+		echo "$PID" > "$pidfile"
+	fi
+}
+
+keys_stop()
+{
+	echo "Stopping keys"
+	PID=`cat "$pidfile"`
+	kill "$PID"
+	rm "$pidfile"
+}
+
+load_rc_config $name
+run_rc_command "$1"
