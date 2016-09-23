@@ -28,12 +28,34 @@
     * `$ reboot`
 4. Configure SSH
     * File is located at `/etc/ssh/sshd_config`
-    * [edits]
+    * Allow password authentication, disable root login
     * service sshd restart
-5. Build and install kernel module
-    * `$ cd /root/`
-    * `$ git clone <url>`
-    * `$ cd rootkit-ctf`
+5. Install packages
+	* `$ pkg install git lsof sudo cowsay`
+6. Configure sudo
+    * `$ visudo`
+    * Add the following line under `root ALL=(ALL) ALL`
+        - `ctf ALL=(root) NOPASSWD: /usr/bin/fstat, /usr/bin/truss, /usr/bin/ktrace, /usr/bin/kdump, /usr/bin/kgdb`
+        - It is also recommended to add some dummy commands that would not harm
+          the CTF to obfuscate the commands needed to solve the challenge. Some
+          good examples include:
+             - ifconfig
+             - nc
+             - ping
+             - finger
+        - The 'redherring' directory is also provided in the repository with
+          dummy binaries, copy them to /usr/bin and add entries for them in the
+          sudoers file
+7. Build and install kernel module
+    * `$ git clone https://github.com/kirbyUK/rootkit-ctf`
+    * `$ cd rootkit-ctf/rootkit`
     * `$ make`
     * `$ make install`
-    * `$ kldload ./[rootkit].ko`
+    * `$ vi /boot/loader.conf`
+        - Add the line `logging_load="YES"`
+8. Build and installer logger program
+    * `$ cd ../keys`
+    * `$ make`
+    * `$ make install`
+    * Double check `/etc/rc.conf` has the line `keys_enable="YES"`
+9. Reboot
