@@ -1,0 +1,11 @@
+#!/bin/sh
+echo "fstat(3, {st_mode=IFDIR|0755, st_size=4096, ...}) = 0"
+echo "close(3)"
+echo "open(\"/usr/lib/locale/en_GB.utf8/LC_MESSAGES/SYS_LC_MESSAGES\", O_RDONLY|O_CLOEXEC) = 3"
+echo "mmap(NULL, 52, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f7d2c753000"
+echo "close(3)"
+echo "write(1, \"why are you still reading this?\") = 33"
+echo "close(1)" = 0
+echo "close(2)" = 0
+echo "exit_group(0)" = ?
+echo "+++ exited with 0 +++"
